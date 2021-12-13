@@ -11,3 +11,9 @@
         msg: "URL = {{URL}}"
       vars:
         URL: task.googgle.com
+- name: Demo on inventory variables
+  hosts: all
+  tasks:
+    - name: print a INV variable
+      ansible.builtin.debug:
+        msg: "URL = {{URL}}"
