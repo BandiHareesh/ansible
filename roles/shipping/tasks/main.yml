@@ -1,2 +1,5 @@
-dependencies:
-  - role: common
+- name: Shipping Setup
+  include_role:
+    name: common
+    tasks_from: java
+
