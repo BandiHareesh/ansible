@@ -1,0 +1,46 @@
+- name: Demo on when conditions
+  hosts: localhost
+  vars:
+    URL: google.org
+    a: 10
+    ACTION: false
+  tasks:
+    - name: Conditon on strings
+      when: URL == "google.com"
+      debug:
+        msg: Heloo
+
+    - name: Conditon on strings
+      when: URL != "google.com"
+      debug:
+        msg: Heloo
+
+    - name: Condition on Numbers
+      when: a == 10
+      debug:
+        msg: Hello
+
+    - name: Condition on Numbers
+      when: a <= 10
+      debug:
+        msg: Hello
+
+    - name: Run if Action is true
+      when: ACTION
+      debug:
+        msg: Hello
+
+    - name: Run if Action is not true
+      when: not ACTION
+      debug:
+        msg: Hello
+
+    - name: Run if variable B is declared
+      when: B is defined
+      debug:
+        msg: Hello
+
+    - name: Run if variable B is not defined and a is less than 10
+      when: B is not defined and a <= 10
+      debug:
+        msg: Hello
