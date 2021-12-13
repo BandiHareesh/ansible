@@ -2,3 +2,10 @@
   hosts: all
   become: yes
   ## for entire playbook run as root user
+  tasks:
+    - name: install nodejs
+      become: yes
+      ## run for this only task
+      ansible.builtin.yum:
+        name: nodejs
+        state: present
