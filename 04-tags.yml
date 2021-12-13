@@ -1,0 +1,34 @@
+- name: Demo on Tags
+  hosts: localhost
+  tasks:
+    - name: Ubuntu task
+      ansible.builtin.debug:
+        msg: ubuntu task
+      tags:
+        - ubuntu
+        - debain
+
+    - name: centos task
+      ansible.builtin.debug:
+        msg: centos task
+      tags:
+        - centos
+        - redhat
+
+- name: Ubuntu Tags
+  hosts: localhost
+  tags:
+    - ubuntu
+  tasks:
+    - name: Ubuntu task
+      ansible.builtin.debug:
+        msg: ubuntu task
+
+- name: centos Tags
+  hosts: localhost
+  tags:
+    - centos
+  tasks:
+    - name: centos task
+      ansible.builtin.debug:
+        msg: centos task
