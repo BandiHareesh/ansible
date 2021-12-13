@@ -25,3 +25,10 @@
     - name: print a file variable
       ansible.builtin.debug:
         msg: "URL = {{URL}}"
+- name: Demo on FACTS
+  hosts: all
+  tasks:
+    - name: print a FACT variable
+      ansible.builtin.debug:
+        msg: "Hostname = {{ansible_fqdn}}"
+## fqdn:fully qualified domain name
