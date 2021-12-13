@@ -1,0 +1,83 @@
+- name: Install nginx
+  ansible.builtin.yum:
+    name: nginx
+    state: installed
+
+- name: Remove old content
+  ansible.builtin.file:
+    path: /usr/share/nginx/html
+    state: absent
+
+- name: Download and Extract Frontend content
+  include_role:
+    name: common
+    tasks_from: download
+
+- name: Copy the extracted content
+  copy:
+    src: /tmp/frontend-main/static/
+    dest: /usr/share/nginx/html/
+    remote_src: yes
+  when: APP_VERSION is not defined
+
+- name: Create App code  Dir
+  file:
+    path: /usr/share/nginx/html/
+    state: directory
+  when:  APP_VERSION is defined
+
+#- name: Download and Extract content
+#  ansible.builtin.unarchive:
+#    src: http://172.31.13.136:8081/repository/{{COMPONENT}}/{{COMPONENT}}-{{APP_VERSION}}.zip
+#    dest: /usr/share/nginx/html/
+#    remote_src: yes
+#  when: APP_VERSION is defined
+
+- name: Download Artifacts
+  shell: az artifacts universal download --organization "https://dev.azure.com/DevOps-Batches/" --project 5b93308d-e2c9-400f-912e-5901c6d6b927 --scope project --feed "batch57" --name {{COMPONENT}} --version {{APP_VERSION}} --path .
+  args:
+    chdir: /usr/share/nginx/html/
+  when: APP_VERSION is defined
+
+- name: Update Main Nginx Config
+  copy:
+    src: nginx.conf
+    dest: /etc/nginx/nginx.conf
+
+#- name: Copy roboshop configuration file
+#  copy:
+#    src: roboshop.conf
+#    dest: /etc/nginx/default.d/roboshop.conf
+
+- name: Update roboshop configuration file
+  template:
+    src: roboshop.conf
+    dest: /etc/nginx/default.d/roboshop.conf
+  when: COMPONENT is not defined
+
+- name: Update roboshop configuration file for LB
+  template:
+    src: roboshop-lb.conf
+    dest: /etc/nginx/default.d/roboshop.conf
+  when: COMPONENT is defined
+
+- name: Install Node Exporter
+  include_role:
+    name: common
+    tasks_from: node-exporter
+
+- name: Setup Filebeat
+  include_role:
+    name: common
+    tasks_from: filebeat
+  vars:
+    LOG_FILE: /var/log/nginx/access.log
+    STRUCTURED: "false"
+    APP_TYPE: nginx
+
+- name: Restart Nginx Service
+  systemd:
+    name: nginx
+    state: restarted
+    enabled: yes
+  ignore_errors: yes
