@@ -1,0 +1,4 @@
+- name: install a package
+  hosts: all
+  become: yes
+  ## for entire playbook run as root user
