@@ -46,3 +46,8 @@
     - name: Print ouput
       ansible.builtin.debug:
         msg: "{{UPTIME}}"
+
+- name: Demo on vars from roles
+  hosts: all
+  roles:
+    - name: demo
