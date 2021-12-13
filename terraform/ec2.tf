@@ -1,9 +1,9 @@
 //resource "aws_spot_instance_request" "cheap_worker" {
 //  count                     = local.LENGTH
-//  ami                       = "ami-074df373d6bafa625"
+//  ami                       = "ami-0855cab4944392d0a"
 //  spot_price                = "0.0031"
 //  instance_type             = "t3.micro"
-//  vpc_security_group_ids    = ["sg-0d00b6b80c9e9b60c"]
+//  vpc_security_group_ids    = ["sg-04bea5344c2dfe413"]
 //  wait_for_fulfillment      = true
 //  //spot_type                 = "persistent"
 //  tags                      = {
@@ -13,9 +13,9 @@
 
 resource "aws_instance" "app-instances" {
   count                       = length(var.APP_COMPONENTS)
-  ami                         = "ami-074df373d6bafa625"
+  ami                         = "ami-0855cab4944392d0a"
   instance_type               = "t3.micro"
-  vpc_security_group_ids      = ["sg-0d00b6b80c9e9b60c"]
+  vpc_security_group_ids      = ["sg-04bea5344c2dfe413"]
     tags                      = {
       Name                    = "${element(var.APP_COMPONENTS, count.index)}-${var.ENV}"
       Monitor                 = "yes"
@@ -24,9 +24,9 @@ resource "aws_instance" "app-instances" {
 
 resource "aws_instance" "db-instances" {
   count                       = length(var.DB_COMPONENTS)
-  ami                         = "ami-074df373d6bafa625"
+  ami                         = "ami-0855cab4944392d0a"
   instance_type               = "t3.micro"
-  vpc_security_group_ids      = ["sg-0d00b6b80c9e9b60c"]
+  vpc_security_group_ids      = ["sg-04bea5344c2dfe413"]
   tags                        = {
     Name                      = "${element(var.DB_COMPONENTS, count.index)}-${var.ENV}"
   }
@@ -43,7 +43,7 @@ resource "aws_route53_record" "app-records" {
   count                     = length(var.APP_COMPONENTS)
   name                      = "${element(var.APP_COMPONENTS, count.index)}-${var.ENV}"
   type                      = "A"
-  zone_id                   = "Z00458692YJCZCCSC0W6X"
+  zone_id                   = "Z020690820L8AJ4UBDKAE"
   ttl                       = 300
   //records                   = [element(aws_instance.instances.*.private_ip, count.index)]
   records                   = [element(aws_instance.app-instances.*.private_ip, count.index)]
@@ -53,7 +53,7 @@ resource "aws_route53_record" "db-records" {
   count                     = length(var.DB_COMPONENTS)
   name                      = "${element(var.DB_COMPONENTS, count.index)}-${var.ENV}"
   type                      = "A"
-  zone_id                   = "Z00458692YJCZCCSC0W6X"
+  zone_id                   = "Z020690820L8AJ4UBDKAE"
   ttl                       = 300
   //records                   = [element(aws_instance.instances.*.private_ip, count.index)]
   records                   = [element(aws_instance.db-instances.*.private_ip, count.index)]
