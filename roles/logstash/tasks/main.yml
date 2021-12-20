@@ -1,0 +1,10 @@
+- name: Update logstash config
+  copy:
+    src: logstash.conf
+    dest: /etc/logstash/conf.d/logstash.conf
+
+- name: Restart Logstash
+  systemd:
+    name: logstash
+    state: restarted
+
