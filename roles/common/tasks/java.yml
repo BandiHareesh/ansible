@@ -1,0 +1,31 @@
+- name: Install Maven
+  yum:
+    name: maven
+    state: present
+
+- name: Download App Code & Add App User
+  include_tasks:
+    file: download.yml
+
+- name: Compile the packages
+  shell: mvn clean package && mv target/shipping-1.0.jar shipping.jar
+  args:
+    chdir: /home/roboshop/{{COMPONENT}}
+  when: APP_VERSION is not defined
+
+- name: Setup SystemD
+  include_tasks:
+    file: setup-systemd.yml
+
+- name: Install Node Exporter
+  include_tasks:
+    file: node-exporter.yml
+
+- name: Install Node Exporter
+  include_tasks:
+    file: filebeat.yml
+  vars:
+    LOG_FILE: /var/log/{{COMPONENT}}.log
+    STRUCTURED: "false"
+    APP_TYPE: java
+
