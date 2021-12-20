@@ -1,0 +1,19 @@
+- name: Copy Hostname Script
+  copy:
+    src: set-hostname.sh
+    dest: /bin/set-hostname
+    mode: u+rwx,g+rx,o+rx
+
+- name: Setup HostName
+  shell: set-hostname {{COMPONENT}}
+
+- name: Update rsyslog conf
+  copy:
+    src: rsyslog.conf
+    dest: /etc/rsyslog.d/roboshop.conf
+
+- name: Restart rsyslog
+  systemd:
+    name: rsyslog
+    state: restarted
+
