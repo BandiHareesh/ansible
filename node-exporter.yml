@@ -1,0 +1,8 @@
+- name: Playbook for node exporter
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Import a role
+      import_role:
+        name: common
+        tasks_from: node-exporter
