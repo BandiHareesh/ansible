@@ -1,0 +1,45 @@
+- name: Create App code Dir
+  file:
+    path: /home/roboshop/{{COMPONENT}}
+    state: directory
+  become_user: roboshop
+  when: COMPONENT != "frontend"
+
+#- name: Download and Extract content
+#  ansible.builtin.unarchive:
+#    src: http://172.31.13.136:8081/repository/{{COMPONENT}}/{{COMPONENT}}-{{APP_VERSION}}.zip
+#    dest: /home/roboshop/{{COMPONENT}}
+#    remote_src: yes
+#  become_user: roboshop
+#  when: COMPONENT != "frontend"
+#
+
+- name: Import RPM key for AZ Repo
+  ansible.builtin.rpm_key:
+    state: present
+    key: https://packages.microsoft.com/keys/microsoft.asc
+
+- name: Copy Az REpo file
+  copy:
+    src: az.repo
+    dest: /etc/yum.repos.d/az.repo
+
+- name: Install AZ Cli
+  yum:
+    name:
+      - azure-cli
+      - libicu
+    state: installed
+
+- name: Install AZ Extention
+  shell: az extension add --name azure-devops
+
+- name: Setup Token
+  shell: echo {{PAT}} | az devops login
+
+- name: Download Artifacts
+  shell: az artifacts universal download --organization "https://dev.azure.com/DevOps-Batches/" --project 5b93308d-e2c9-400f-912e-5901c6d6b927 --scope project --feed "batch57" --name {{COMPONENT}} --version {{APP_VERSION}} --path .
+  args:
+    chdir: /home/roboshop/{{COMPONENT}}
+  when: COMPONENT != "frontend"
+
