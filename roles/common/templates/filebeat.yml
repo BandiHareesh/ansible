@@ -1,0 +1,37 @@
+filebeat.inputs:
+  - type: log
+    enabled: true
+  {% if STRUCTURED == "true" %}
+json.keys_under_root: true
+  {% endif %}
+paths:
+  - {{LOG_FILE}}
+fields:
+  component: {{COMPONENT}}
+  STRUCTURED: {{STRUCTURED}}
+  APP_TYPE: {{APP_TYPE}}
+  {% if APP_TYPE == "java" %}
+multiline.pattern: "^[0-9][0-9][0-9][0-9]-"
+multiline.negate: true
+multiline.match: after
+  {% endif %}
+  {% if APP_TYPE == "python" %}
+include_lines: ['^\[']
+  {% endif %}
+output.logstash:
+  hosts: ["elk.roboshop.internal:5044"]
+
+### Following are defaults
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+setup.template.settings:
+  index.number_of_shards: 1
