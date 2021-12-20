@@ -1,0 +1,24 @@
+- name: Add RoboShop Application User
+  ansible.builtin.user:
+    name: roboshop
+  register: app_user
+
+- name: Delete Old App code
+  file:
+    path: /home/roboshop/{{COMPONENT}}
+    state: absent
+
+- name: Download from Github
+  include_tasks:
+    file: download-from-github.yml
+  when: APP_VERSION is not defined
+
+#- name: Download from Nexus
+#  include_tasks:
+#    file: download-from-nexus.yml
+#  when: APP_VERSION is defined
+
+- name: Download from Azure Artifacts
+  include_tasks:
+    file: download-from-az.yml
+  when: APP_VERSION is defined
