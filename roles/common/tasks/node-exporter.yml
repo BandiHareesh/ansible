@@ -1,0 +1,32 @@
+- name: Check node exporter does exist
+  stat:
+    path: /opt/node_exporter
+  register: out
+
+- name: Install Node Exporter
+  when: not out.stat.exists
+  block:
+    - name: Download Prometheus Archive
+      unarchive:
+        src: "{{NODE_EXPORTER_URL}}"
+        dest: /tmp
+        remote_src: yes
+
+    - name: Copy Node Exporter to /opt
+      copy:
+        src: /tmp/{{ NODE_EXPORTER_URL | split('/') | last | regex_replace('.tar.gz', '') }}/
+        dest: /opt/node_exporter/
+        remote_src: yes
+
+- name: Setup Node Exporter Service
+  copy:
+    src: node_exporter.service
+    dest: /etc/systemd/system/node_exporter.service
+
+- name: Start Node Exporter Service
+  systemd:
+    name: node_exporter
+    state: started
+    enabled: yes
+
+
